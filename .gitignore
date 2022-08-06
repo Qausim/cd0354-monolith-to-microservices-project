@@ -40,3 +40,10 @@ venv/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# env
+.env
+
+# others
+db_data
+db.deployment.yml

@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13.4-alpine
+    environment:
+      POSTGRES_USER: $POSTGRES_USERNAME
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - "./db_data:/var/lib/postgresql/data"
+  backend-user:
+    image: udagram-api-user
+    build:
+      context: ./udagram-api-user
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - "./udagram-api-user:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USERNAME: $POSTGRES_USERNAME
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+      JWT_SECRET: $JWT_SECRET
+      AWS_REGION: $AWS_REGION
+      AWS_PROFILE: $AWS_PROFILE 
+      AWS_BUCKET: $AWS_BUCKET
+      URL: "http://localhost:8100"
+  backend-feed:
+    image: udagram-api-feed
+    build:
+      context: ./udagram-api-feed
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - "./udagram-api-feed:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USERNAME: $POSTGRES_USERNAME
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+      AWS_REGION: $AWS_REGION
+      AWS_PROFILE: $AWS_PROFILE 
+      AWS_BUCKET: $AWS_BUCKET
+      JWT_SECRET: $JWT_SECRET
+      URL: "http://localhost:8100"
+  reverseproxy:
+    image: reverseproxy
+    build:
+      context: ./udagram-reverseproxy
+    restart: always
+    depends_on:
+      - backend-user
+      - backend-feed
+    volumes:
+      - "./udagram-reverseproxy/nginx.conf:/etc/nginx/nginx.conf"
+    ports:
+      - "8080:8080"
+  frontend:
+    image: udagram-frontend
+    build:
+      context: ./udagram-frontend
+    depends_on:
+      - reverseproxy
+    volumes:
+      - "./udagram-frontend:/usr/src/app"
+      - "/usr/src/app/node_modules"
+    ports:
+      - "8100:80"
