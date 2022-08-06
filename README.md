@@ -71,13 +71,13 @@ Launch the frontend app locally.
     ```bash
     docker-compose up -d
     ```
-* A database instance is automatically created using the database name, user name and password set for database in `.env``
+* A database instance is automatically created using the database name, user name and password set for database in `.env`
 
-* You can visit the APIs at `http://localhost:8080/api/v0/[feed|users]``
+* You can visit the APIs at `http://localhost:8080/api/v0/(feed|users)`
 
 * You can visit the frontend `http://localhost:8100` (set `apiHost` in `udagram-frontend/src/environments/(environment|environment.prod).ts` to `http://localhost:8080`)
 
-### 6. You can access the deployed frontend at `http://acd88ee91d4e94a4d955826bb6cdff44-1817241424.us-east-1.elb.amazonaws.com`
+### 6. You can access the deployed frontend [here](http://acd88ee91d4e94a4d955826bb6cdff44-1817241424.us-east-1.elb.amazonaws.com)
 
 ## Tips
 1. Take a look at `udagram-api` -- does it look like we can divide it into two modules to be deployed as separate microservices?
