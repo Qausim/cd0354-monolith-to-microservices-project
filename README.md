@@ -14,20 +14,15 @@ The project is split into two parts:
 2. Environment variables will need to be set. These environment variables include database connection details that should not be hard-coded into the application code.
 
 #### Environment Script
-A file named `set_env.sh` has been prepared as an optional tool to help you configure these variables on your local development environment.
- 
-We do _not_ want your credentials to be stored in git. After pulling this `starter` project, run the following command to tell git to stop tracking the script in git but keep it stored locally. This way, you can use the script for your convenience and reduce risk of exposing your credentials.
-`git rm --cached set_env.sh`
-
-Afterwards, we can prevent the file from being included in your solution by adding the file to our `.gitignore` file.
+Create a `.env` file in the root directory and populate with values as written in `.env.sample` replacing the dummy values with real ones. The file has been added to `.gitignore`.
 
 ### 1. Database
-Create a PostgreSQL database either locally or on AWS RDS. The database is used to store the application's metadata.
+If not running the app using `docker-compose`, create a PostgreSQL database either locally or on AWS RDS. The database is used to store the application's metadata.
 
 * We will need to use password authentication for this project. This means that a username and password is needed to authenticate and access the database.
 * The port number will need to be set as `5432`. This is the typical port that is used by PostgreSQL so it is usually set to this port by default.
 
-Once your database is set up, set the config values for environment variables prefixed with `POSTGRES_` in `set_env.sh`.
+Once your database is set up, set the config values for environment variables prefixed with `POSTGRES_` in `.env`.
 * If you set up a local database, your `POSTGRES_HOST` is most likely `localhost`
 * If you set up an RDS database, your `POSTGRES_HOST` is most likely in the following format: `***.****.us-west-1.rds.amazonaws.com`. You can find this value in the AWS console's RDS dashboard.
 
@@ -35,12 +30,12 @@ Once your database is set up, set the config values for environment variables pr
 ### 2. S3
 Create an AWS S3 bucket. The S3 bucket is used to store images that are displayed in Udagram.
 
-Set the config values for environment variables prefixed with `AWS_` in `set_env.sh`.
+Set the config values for environment variables prefixed with `AWS_` in `.env`.
 
 ### 3. Backend API
 Launch the backend API locally. The API is the application's interface to S3 and the database.
 
-* To download all the package dependencies, run the command from the directory `udagram-api/`:
+* To download all the package dependencies, run the command from the directory `udagram-api-user/` and `udagram-api-feed/`:
     ```bash
     npm install .
     ```
@@ -70,6 +65,19 @@ Launch the frontend app locally.
     ionic serve
     ```
 * You can visit `http://localhost:8100` in your web browser to verify that the application is running. You should see a web interface.
+
+### 5. Run with docker-compose
+* To run the apps, from the root directory run:
+    ```bash
+    docker-compose up -d
+    ```
+* A database instance is automatically created using the database name, user name and password set for database in `.env``
+
+* You can visit the APIs at `http://localhost:8080/api/v0/[feed|users]``
+
+* You can visit the frontend `http://localhost:8100` (set `apiHost` in `udagram-frontend/src/environments/(environment|environment.prod).ts` to `http://localhost:8080`)
+
+### 6. You can access the deployed frontend at `http://acd88ee91d4e94a4d955826bb6cdff44-1817241424.us-east-1.elb.amazonaws.com`
 
 ## Tips
 1. Take a look at `udagram-api` -- does it look like we can divide it into two modules to be deployed as separate microservices?
