@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udagram-user
+  labels:
+    app: udagram-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: udagram-user
+  template:
+    metadata:
+      labels:
+        app: udagram-user
+    spec:
+      containers:
+      - name: udagram-user
+        image: qausim/udagram-api-user:v1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: aws-credentials
+          mountPath: "/root/.aws"
+          readOnly: true
+        resources:
+          requests:
+            memory: "1500Mi"
+            cpu: "1000m"
+          limits:
+            memory: "3000Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: env-secrets
+                key: pg-host
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: env-secrets
+                key: pg-username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: env-secrets
+                key: pg-password
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: env-secrets
+                key: pg-database
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: env-secrets
+                key: jwt-secret
+          - name: URL
+            valueFrom:
+              configMapKeyRef:
+                name: env-configs
+                key: url
+          - name: AWS_REGION
+            valueFrom:
+              secretKeyRef:
+                name: aws-secrets
+                key: aws-region
+          - name: AWS_PROFILE
+            valueFrom:
+              secretKeyRef:
+                name: aws-secrets
+                key: aws-profile
+          - name: AWS_BUCKET
+            valueFrom:
+              secretKeyRef:
+                name: aws-secrets
+                key: aws-bucket
+      volumes:
+      - name: aws-credentials
+        secret:
+          secretName: aws-secrets
+          items:
+          - key: credentials
+            path: credentials
+          - key: config
+            path: config
+          optional: false
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-user
+spec:
+  selector:
+    app: udagram-user
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
